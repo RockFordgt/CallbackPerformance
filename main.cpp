@@ -6,6 +6,8 @@
 #include <boost/signals.hpp>
 #include <boost/signals2.hpp>
 
+#include <qt5/QtCore/qobject.h>
+
 #include "./func.hpp"
 
 void print_duration(std::ostream &out, const std::string& str, const std::chrono::high_resolution_clock::duration &d)
@@ -157,6 +159,21 @@ void measure_boost_signals2_call()
     print_duration(std::cout, "boost::signals2 call", total / i);
 }
 
+void measure_qt_signal_call()
+{
+
+    Caller caller;
+    Receiver receiver;
+
+    QObject::connect(&caller, &Caller::call, &receiver, &Receiver::func);
+
+    caller.run();
+
+    print_duration(std::cout, "QObject signals", caller.total / caller.i);
+    std::cout << "receiver counter:" << receiver.counter << std::endl;
+
+}
+
 int main()
 {
     direct_call();
@@ -167,6 +184,7 @@ int main()
     measure_boost_signals_call();
     measure_boost_signals2_no_mutex_call();
     measure_boost_signals2_call();
+    measure_qt_signal_call();
 
     return 0;
 }
